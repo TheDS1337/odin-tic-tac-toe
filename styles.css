@@ -22,24 +22,25 @@ header {
 }
 
 main {
-    width: 130vh;
-    height: 85vh;
     margin: auto;
     display: flex;
     justify-content: space-between;
 }
 
-#console {
-    width: 45vh;
-    background-color: var(--color-player);
+#board {
+    width: 75vh;
+    height: 75vh;
+    background-color: var(--color1);
+    display: grid;
+    grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+    gap: 10px;
 }
 
-#game {
-    width: 85vh;
-    background-color: var(--color-computer);
+.cell {
+    opacity: 0.75;
 }
 
 footer {
-    flex-shrink: 1;
-    padding-bottom: 50px;
+    padding-top: 50px;
+    padding-bottom: 10px;
 }
