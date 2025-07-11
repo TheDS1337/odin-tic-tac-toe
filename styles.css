@@ -1,3 +1,45 @@
+:root {
+    --color-player: #0092ca;
+    --color-computer: #d65a31;
+    --color1: #222831;
+    --color2: #393e46;
+    --color3: #eeeeee;
+}
+
 body {
-    background-color: brown;
+    color: var(--color3);
+    background-color: var(--color1);
+    height: 95vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header {
+    flex-shrink: 1;
+    padding-bottom: 10px;
+}
+
+main {
+    width: 130vh;
+    height: 85vh;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+}
+
+#console {
+    width: 45vh;
+    background-color: var(--color-player);
+}
+
+#game {
+    width: 85vh;
+    background-color: var(--color-computer);
+}
+
+footer {
+    flex-shrink: 1;
+    padding-bottom: 50px;
 }

@@ -48,7 +48,6 @@ const game = (
             }
 
             if( board.fillBoard(x, y) ) {
-            
                 let winner = checkWinner();
 
                 if( winner === -1 ) {
@@ -61,6 +60,6 @@ const game = (
             return -1;
         }
 
-        return { showBoard, makeMove };
+        return { makeMove };
     }
 )();
