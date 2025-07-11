@@ -32,8 +32,6 @@ main {
     height: 75vh;
     background-color: var(--color1);
     display: grid;
-    grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-    gap: 10px;
 }
 
 .cell {
