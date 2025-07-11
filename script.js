@@ -1,105 +1,85 @@
-const game = (function(doc)
+function Player(name)
 {
+    let score = 0;
+
+    const getName = () => name;
+    const setName = (newName) => name = newName;
+    const getScore = () => score;
+    const increaseScore = () => score++;
+    const resetScore = () => score = 0;
+
+    return { getName, setName, getScore, increaseScore, resetScore };
+}
+
+let gameBoard = (function(doc)
+{
+    let cells = [];
     let boardElement = doc.querySelector("#board");
 
-    let board = null;
-    let scoreComputer = 0;
-    let scoreHuman = 0;
-    let ties = 0;
-    let roundsPlayed = 0;
+    const createCells = (size = 3) => {
+        boardElement.style.gridTemplate = `repeat(${size}, 1fr) / repeat(${size}, 1fr)`
+        boardElement.style.gap = `${4 / size}vh`;
 
-    function makeMove(x, y)
-    {
-        const checkWinner = () => {
-            for( let row of board.getCells() ) {
-                let sameTypeCount = 1;
-                let lastBoardCell = '';
+        cells = [];
+        for( let i = 0; i < size; i++ ) {
+            let j = 0;
 
-                for( let i = 1; i < row.length; i++ ) {
-                    lastBoardCell = row[i];
+            cells.push(Array.from(Array(size), () => {
+                    let cell = doc.createElement("button");
 
-                    if( lastBoardCell === '' || lastBoardCell !== row[i - 1] )
-                        break;
+                    cell.id = `cell-${i}-${j++}`;
+                    cell.classList.add("cell");
 
-                    sameTypeCount++;
-                }
+                    boardElement.appendChild(cell);
 
-                if( sameTypeCount === 3 )
-                    return lastBoardCell === 'X' ? 0 : 1;
-            }
+                    return cell;
+            }));
+        }
+    };
 
-            // No winner yet
-            return -1;
+    const removeCells = () => {
+        let boardParentElement = boardElement.parentNode;
+        let boardElementType = boardElement.tagName;
+
+        boardElement.remove();
+
+        boardElement = doc.createElement(boardElementType);
+        boardElement.id = "board";
+
+        boardParentElement.appendChild(boardElement);
+    };
+
+    const fillCell = (x, y, type) => {
+        if( cells[x][y].textContent.length > 0 ) {
+            console.log(`The cell at (${x}, ${y}) is already filled.`);
+            return false;
         }
 
-        if( board.fillBoard(x, y) ) {
-            let winner = checkWinner();
+        cells[x][y].textContent = type === 0 ? 'O' : 'X';
+        return true;
+    }
 
-            if( winner === -1 ) {
-                board.updateNextMove();
-                console.log(`Now player ${board.getNextMove() + 1} can make a move.`);
-            } else 
-                console.log(`We have a winner! Player ${winner + 1} won the match!`);
-        }
-
+    const rowOrDiagWin = (arr) => {
+        // Do checks in all rows / the one diagonal
         return -1;
     }
 
-    function createBoard(resetScores = false, size = 3)
-    {
-        if( resetScores ) {
-            scoreComputer = 0;
-            scoreHuman = 0;
-            ties = 0;
-            roundsPlayed = 0;
-        }
+    const checkWinner = () => {
+        let winnerType = rowOrDiagWin(cells);
 
-        board = (function ()
-        {
-            boardElement.style.gridTemplate = `repeat(${size}, 1fr) / repeat(${size}, 1fr)`
-            boardElement.style.gap = `${4 / size}vh`;
-            console.log(boardElement.style.gap);
+        if( winnerType === -1 )
+            winnerType = rowOrDiagWin(/*rotatedCells*/cells);
 
-            let nextMove = roundsPlayed++ % 2;
-
-            let cells = [];
-            for( let i = 0; i < size; i++ ) {
-                cells.push(Array.from(Array(size), () => {
-                        let cell = document.createElement("button");
-
-                        cell.classList.add("cell");
-                        boardElement.appendChild(cell);
-
-                        return cell;
-                }));
-            }
-
-            console.log(cells);
-
-            const fillBoard = (x, y) => {
-                if( cells[x][y].textContent !== '' ) {
-                    console.log("This cell cannot be filled")
-                    return false;
-                }
-
-                cells[x][y] = nextMove === 0 ? 'X' : 'O';
-                return true;
-            }
-
-            const getCells = () => cells;
-            const getNextMove = () => nextMove;
-            const updateNextMove = () => nextMove = 1 - nextMove;
-
-            return { getCells, getNextMove, fillBoard, updateNextMove };
-        })();
+        return winnerType;
     }
 
-    function think()
-    {
-    }
-
-    return { createBoard, think };
+    return { createCells, removeCells, fillCell, checkWinner };
 })(document);
 
-game.createBoard(true);
-game.think();
+let human = Player("Amine");
+let computer = Player("Computer");
+
+const gameController = (function (board, players) {
+    board.createCells();
+
+})(gameBoard, [ human, computer ]);
