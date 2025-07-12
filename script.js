@@ -13,10 +13,14 @@ function Player(name)
 
 function GameBoard(doc)
 {
+    const typeToMark = ['X', 'O'];
+    const typeToColor = ['var(--color-player)', 'var(--color-computer)'];
+
     let cells = [];
     let boardElement = doc.querySelector("#board");
+    let currMove = -1;
 
-    const createCells = (size = 3) => {
+    const createCells = (startingMove = 0, size = 3) => {
         boardElement.style.display = "grid";
         boardElement.style.gridTemplate = `repeat(${size}, 1fr) / repeat(${size}, 1fr)`
         boardElement.style.gap = `${4 / size}vh`;
@@ -30,11 +34,15 @@ function GameBoard(doc)
                     cell.id = `cell-${i}-${j++}`;
                     cell.classList.add("cell");
 
+                    cell.addEventListener("click", onCellClick);
+
                     boardElement.appendChild(cell);
 
                     return cell;
             }));
         }
+
+        currMove = startingMove;
     };
 
     const removeCells = () => {
@@ -50,40 +58,79 @@ function GameBoard(doc)
         boardParentElement.insertBefore(boardElement, boardParentElement.firstChild);
     };
 
-    const fillCell = (x, y, type) => {
-        if( cells[x][y].textContent.length > 0 ) {
-            console.log(`The cell at (${x}, ${y}) is already filled.`);
-            return false;
+    const checkConsecutiveMarks = (arr) => {
+        let lastType = arr[0].textContent;
+
+        for( let i = 1; i < arr.length; i++ ) {
+            let currType = arr[i].textContent;
+
+            if( currType.length === 0 )
+                return -1;
+
+            if( currType !== lastType )
+                return -1;
+
+            lastType = currType;
         }
 
-        cells[x][y].textContent = type === 0 ? 'O' : 'X';
-        return true;
-    }
-
-    const rowOrDiagWin = (arr) => {
-        // Do checks in all rows / the one diagonal
-        return -1;
+        return typeToMark.indexOf(lastType);
     }
 
     const checkWinner = () => {
-        let winnerType = rowOrDiagWin(cells);
+        let lines = [cells.map((row, i) => row[i]), cells.map((row, i) => row[cells.length - i - 1])];
 
-        if( winnerType === -1 )
-            winnerType = rowOrDiagWin(/*rotatedCells*/cells);
+        for( let i = 0; i < cells.length; i++ ) {
+            lines.push(cells.map((row) => row[i]));
+            lines.push(cells[i]);
+        }
 
-        return winnerType;
+        for( line of lines ) {
+            let winner = checkConsecutiveMarks(line);
+
+            if( winner !== -1 )
+                return winner;
+        }
+
+        return -1;
     }
 
-    return { createCells, removeCells, fillCell, checkWinner };
+    const onCellClick = (event) => {
+        let buttonElement = event.target;
+
+        let idToStr = buttonElement.id.split('-');
+        let x = parseInt(idToStr[1]);
+        let y = parseInt(idToStr[2]); 
+
+        if( buttonElement.textContent.length > 0 ) {
+            console.log(`Cannot click on the cell at (${x}, ${y}), as it is already filled.`);
+            return;
+        }
+
+        buttonElement.textContent = typeToMark[currMove];
+        buttonElement.style.backgroundColor = typeToColor[currMove];
+
+        currMove = 1 - currMove;
+
+        let winner = checkWinner();
+
+        if( winner !== -1 ) {
+            console.log("Chicken dinner, we have a winner!");
+            console.log(`Player ${winner} won the game.`);
+        }
+    };
+
+    return { createCells, removeCells, checkWinner };
 };
 
 let human = Player("Amine");
 let computer = Player("Computer");
 
 const gameController = (function (doc, board, players) {
+    let roundCounter = 0;
+
     const startRound = () => {
         board.removeCells();
-        board.createCells();
+        board.createCells(roundCounter % 2);
     }
 
     doc.querySelector("#button-start").addEventListener("click", () => startRound());
