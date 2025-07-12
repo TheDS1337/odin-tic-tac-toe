@@ -85,10 +85,12 @@ function GameBoard(doc)
     const getBoardElement = () => boardElement;
 
     const getLineType = (line) => {
-        if( line[0].childElementCount === 0 )
+        let classNames = line[0].className.split(' ');
+
+        if( !classNames.includes(typeToMark[0]) && !classNames.includes(typeToMark[1]) )
             return -1;
 
-        let type = line[0].className.split(' ').pop();
+        let type = classNames.pop();
 
         if( !line.every(cell => type === cell.className.split(' ').pop()) )
             return -1;
@@ -129,7 +131,11 @@ function GameBoard(doc)
         // Just some stupid AI logic here :]
         const getRandom = (max, min = 0) => min + Math.floor(Math.random() * (max - min));
 
-        let emptyCells = cells.flat().filter(cell => cell.childElementCount === 0);
+        let emptyCells = cells.flat().filter(cell => {
+            let classNames = cell.className.split(' ');
+        
+            return !classNames.includes(typeToMark[0]) && !classNames.includes(typeToMark[1])
+        });
 
         if( emptyCells.length === 0 )
             return;
@@ -139,11 +145,6 @@ function GameBoard(doc)
             let buttonElement = emptyCells[getRandom(emptyCells.length)];
 
             buttonElement.classList.add(typeToMark[currMove]);
-
-            let imgElement = doc.createElement("img");
-            imgElement.src = `icons/${typeToMark[currMove]}.svg`;
-
-            buttonElement.appendChild(imgElement);
 
             let idToStr = buttonElement.id.split('-');
             let x = parseInt(idToStr[1]) + 1;
@@ -168,19 +169,16 @@ function GameBoard(doc)
 
         let idToStr = buttonElement.id.split('-');
         let x = parseInt(idToStr[1]) + 1;
-        let y = parseInt(idToStr[2]) + 1; 
+        let y = parseInt(idToStr[2]) + 1;
 
-        if( buttonElement.childElementCount > 0 ) {
+        let classNames = buttonElement.className.split(' ');
+
+        if( classNames.includes(typeToMark[0]) || classNames.includes(typeToMark[1]) ) {
             console.log(`Cannot click on the cell at (${x}, ${y}), as it is already filled.`);
             return;
         }
 
         buttonElement.classList.add(typeToMark[currMove]);
-
-        let imgElement = doc.createElement("img");
-        imgElement.src = `icons/${typeToMark[currMove]}.svg`;
-
-        buttonElement.appendChild(imgElement);
 
         if( onGameMove !== null )
             onGameMove(currMove, {x, y});
@@ -204,10 +202,10 @@ const gameController = (function (doc, board, players) {
     let consoleElement = doc.querySelector("#console");
     consoleElement.innerHTML = "";
 
-    let tiesScoreElement = doc.querySelector("#score-ties .score");
+    let tiesScoreElement = doc.querySelector("#score-ties .score + div");
 
-    players[0].setScoreElement(doc.querySelector("#score-human .score"));
-    players[1].setScoreElement(doc.querySelector("#score-computer .score"));
+    players[0].setScoreElement(doc.querySelector("#score-human .score + div"));
+    players[1].setScoreElement(doc.querySelector("#score-computer .score + div"));
 
     let roundCounter = 0;
     let tiesCounter = 0;
@@ -246,16 +244,11 @@ const gameController = (function (doc, board, players) {
         
         setTimeout(() => {
             let restartButtonElement = doc.createElement("button");
-            restartButtonElement.id = "button-restart";
 
+            restartButtonElement.id = "button-restart";
             restartButtonElement.addEventListener("click", () => startNewRound());
 
-            let restartButtonImage = doc.createElement("img");
-            restartButtonImage.src = "icons/restart.svg";
-
-            restartButtonElement.appendChild(restartButtonImage);
             blurElement.appendChild(restartButtonElement);
-
         }, 2000);
     };
 })(document, GameBoard(document), [ human, computer ]);

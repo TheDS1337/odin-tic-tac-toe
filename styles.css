@@ -80,18 +80,26 @@ main {
     height: 12.5vh;
 }
 
-.X > img {
+.X, .O, #button-restart {
+    background: none;
+    border: none;
+}
+
+.X {
+    background-image: url("icons/X.svg");
+    background-size: cover;
     filter: invert(44%) sepia(57%) saturate(5312%) hue-rotate(172deg) brightness(96%) contrast(101%);
 }
 
 
-.O > img {
+.O {
+    background-image: url("icons/O.svg");
+    background-size: cover;
     filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(89%) contrast(87%);
 }
 
 #scores {
     height: 15vh;
-    color: #00ff00;
     border: 2px solid var(--color-console);
     border-radius: 5px;
     display: grid;
@@ -102,52 +110,80 @@ main {
 #scores > div {
     padding-top: 2vh;
     padding-bottom: 1vh;
-    background-color: var(--color2);
-    font-size: 4vh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
 }
 
-#scores img {
+.score {
     width: 7vh;
     height: 7vh;
+    background-size: cover;
 }
 
-#score-human > img {
-    filter: invert(44%) sepia(57%) saturate(5312%) hue-rotate(172deg) brightness(96%) contrast(101%);
+.score + div {
+    color: var(--color-console);
+    font-size: 4vh;
 }
 
-#score-ties > img {
+#score-human > .score {
+    background-image: url("icons/human.svg");
+    filter: invert(44%) sepia(57%) saturate(5312%) hue-rotate(172deg) brightness(50%) contrast(101%);
+}
+
+#score-human > .score:hover {
+    filter: invert(44%) sepia(57%) saturate(5312%) hue-rotate(172deg) brightness(100%) contrast(101%);
+}
+
+#score-ties > .score {
+    background-image: url("icons/ties.svg");
     filter: invert(99%) sepia(87%) saturate(79%) hue-rotate(205deg) brightness(114%) contrast(87%);
 }
 
-#score-computer > img {
-    filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(89%) contrast(87%);
+#score-computer > .score {
+    background-image: url("icons/computer.svg");
+    filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(50%) contrast(87%);
+}
+
+#score-computer > .score:hover {
+    filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(100%) contrast(87%);
 }
 
 #blur {
     position: absolute;
     width: 100%;
     height: 100%;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    mask-image: radial-gradient(circle, black 75%, transparent 110%);
-    -webkit-mask-image: radial-gradient(circle, black 75%, transparent 110%);
+    backdrop-filter: blur(2.5px);
+    -webkit-backdrop-filter: blur(2.5px);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-#button-restart > img {
+#button-restart {
     width: 50vh;
     height: 50vh;
+    background-image: url("icons/restart.svg");
+    background-size: cover;
     filter: invert(69%) sepia(81%) saturate(4164%) hue-rotate(83deg) brightness(111%) contrast(131%);
 }
 
 footer {
     padding-top: 10px;
     padding-bottom: 10px;
-    color: #eeeeee;
+    color: var(--color-console);
+}
+
+a {
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:link {
+    color: var(--color3);
+}
+
+a:hover {
+    color: var(--color-console);
 }
