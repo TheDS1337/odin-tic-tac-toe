@@ -11,16 +11,16 @@ function Player(name)
     return { getName, setName, getScore, increaseScore, resetScore };
 }
 
-let gameBoard = (function(doc)
+function GameBoard(doc)
 {
     let cells = [];
     let boardElement = doc.querySelector("#board");
 
     const createCells = (size = 3) => {
+        boardElement.style.display = "grid";
         boardElement.style.gridTemplate = `repeat(${size}, 1fr) / repeat(${size}, 1fr)`
         boardElement.style.gap = `${4 / size}vh`;
 
-        cells = [];
         for( let i = 0; i < size; i++ ) {
             let j = 0;
 
@@ -45,8 +45,9 @@ let gameBoard = (function(doc)
 
         boardElement = doc.createElement(boardElementType);
         boardElement.id = "board";
+        cells = [];
 
-        boardParentElement.appendChild(boardElement);
+        boardParentElement.insertBefore(boardElement, boardParentElement.firstChild);
     };
 
     const fillCell = (x, y, type) => {
@@ -74,12 +75,16 @@ let gameBoard = (function(doc)
     }
 
     return { createCells, removeCells, fillCell, checkWinner };
-})(document);
+};
 
 let human = Player("Amine");
 let computer = Player("Computer");
 
-const gameController = (function (board, players) {
-    board.createCells();
+const gameController = (function (doc, board, players) {
+    const startRound = () => {
+        board.removeCells();
+        board.createCells();
+    }
 
-})(gameBoard, [ human, computer ]);
+    doc.querySelector("#button-start").addEventListener("click", () => startRound());
+})(document, GameBoard(document), [ human, computer ]);
