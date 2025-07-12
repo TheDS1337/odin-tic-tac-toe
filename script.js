@@ -38,9 +38,10 @@ function GameBoard(doc)
     let boardElement = doc.querySelector("#board");
     let currMove = -1;
     let playCounter = 0;
+    let onGameMove = null;
     let onGameEnd = null;
 
-    const createCells = (callback, startingMove = 0, size = 3) => {
+    const createCells = (moveCallback = null, endCallback = null, startingMove = 0, size = 3) => {
         boardElement.style.display = "grid";
         boardElement.style.gridTemplate = `repeat(${size}, 1fr) / repeat(${size}, 1fr)`
         boardElement.style.gap = `${4 / size}vh`;
@@ -62,7 +63,8 @@ function GameBoard(doc)
 
         currMove = startingMove;
         playCounter = 0;
-        onGameEnd = callback;
+        onGameMove = moveCallback;
+        onGameEnd = endCallback;
     };
 
     const clear = () => {
@@ -98,19 +100,48 @@ function GameBoard(doc)
         for( line of lines ) {
             let winner = getLineType(line);
 
-            if( winner !== -1 )
+            if( winner !== -1 ) {
+                if( onGameEnd !== null )
+                    onGameEnd(winner);
+
+                cells.forEach(r => r.forEach(cell => cell.removeEventListener("click", onCellClick)));
+
                 return winner;
+            }
+        }
+
+        if( playCounter === cells.length * cells.length ) {
+            if( onGameEnd !== null )
+                onGameEnd(-1);
         }
 
         return -1;
     }
 
+    const computerMakeMove = () => {
+        // Just some stupid AI logic here :]
+
+        let emptyCells = cells.flat().filter(cell => cell.textContent.length === 0);
+
+        if( emptyCells.length === 0 ) {
+            return;
+        }
+
+        let buttonElement = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+
+        buttonElement.textContent = typeToMark[currMove];
+        buttonElement.style.backgroundColor = typeToColor[currMove];
+
+        playCounter++;
+        currMove = 1 - currMove;
+    };
+
     const onCellClick = (event) => {
         let buttonElement = event.target;
 
         let idToStr = buttonElement.id.split('-');
-        let x = parseInt(idToStr[1]);
-        let y = parseInt(idToStr[2]); 
+        let x = parseInt(idToStr[1]) + 1;
+        let y = parseInt(idToStr[2]) + 1; 
 
         if( buttonElement.textContent.length > 0 ) {
             console.log(`Cannot click on the cell at (${x}, ${y}), as it is already filled.`);
@@ -120,19 +151,21 @@ function GameBoard(doc)
         buttonElement.textContent = typeToMark[currMove];
         buttonElement.style.backgroundColor = typeToColor[currMove];
 
+        if( onGameMove !== null )
+            onGameMove(currMove, {x, y});
+
+        playCounter++;
         currMove = 1 - currMove;
 
         let winner = checkWinner();
 
-        if( winner !== -1 || ++playCounter === cells.length * cells.length ) {
-            if( onGameEnd !== null )
-                onGameEnd(winner);
-
-            cells.forEach(r => r.forEach(cell => cell.removeEventListener("click", onCellClick)));
-        } 
+        if( winner === -1 ) {
+            computerMakeMove();
+            checkWinner();
+        }
     };
 
-    return { createCells, clear, checkWinner };
+    return { createCells, clear };
 };
 
 let human = Player("Amine");
@@ -150,11 +183,16 @@ const gameController = (function (doc, board, players) {
 
     doc.querySelector("#button-start").addEventListener("click", () => {
         board.clear();
-        board.createCells(onRoundEnd, roundCounter % 2);
+        board.createCells(onRoundMove, onRoundEnd, roundCounter % 2);
 
         consoleElement.innerHTML += `> Round ${++roundCounter}\n\n`;
         consoleElement.scrollTop = consoleElement.scrollHeight;
     });
+
+    const onRoundMove = (mover, pos) => {
+        consoleElement.innerHTML += `> ${players[mover].getName()} played the position (${pos.x}, ${pos.y}).\n`;
+        consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
 
     const onRoundEnd = winner => {
         if( winner === -1 ) {
