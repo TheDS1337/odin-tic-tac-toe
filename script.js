@@ -19,8 +19,10 @@ function GameBoard(doc)
     let cells = [];
     let boardElement = doc.querySelector("#board");
     let currMove = -1;
+    let playCounter = 0;
+    let onGameEnd = null;
 
-    const createCells = (startingMove = 0, size = 3) => {
+    const createCells = (callback, startingMove = 0, size = 3) => {
         boardElement.style.display = "grid";
         boardElement.style.gridTemplate = `repeat(${size}, 1fr) / repeat(${size}, 1fr)`
         boardElement.style.gap = `${4 / size}vh`;
@@ -41,9 +43,11 @@ function GameBoard(doc)
         });
 
         currMove = startingMove;
+        playCounter = 0;
+        onGameEnd = callback;
     };
 
-    const removeCells = () => {
+    const clear = () => {
         let boardParentElement = boardElement.parentNode;
         let boardElementType = boardElement.tagName;
 
@@ -103,15 +107,15 @@ function GameBoard(doc)
 
         let winner = checkWinner();
 
-        if( winner !== -1 ) {
-            consoleElement.innerHTML += `> Player ${winner} won the game. Chicken dinner, we have a winner!\n`;
-            consoleElement.scrollTop = consoleElement.scrollHeight;
-            
+        if( winner !== -1 || ++playCounter === cells.length * cells.length ) {
+            if( onGameEnd !== null )
+                onGameEnd(winner);
+
             cells.forEach(r => r.forEach(cell => cell.removeEventListener("click", onCellClick)));
-        }
+        } 
     };
 
-    return { createCells, removeCells, checkWinner };
+    return { createCells, clear, checkWinner };
 };
 
 let human = Player("Amine");
@@ -119,13 +123,27 @@ let computer = Player("Computer");
 
 const gameController = (function (doc, board, players) {
     let roundCounter = 0;
+    let tiesCounter = 0;
 
-    const startRound = () => {
-        board.removeCells();
-        board.createCells(roundCounter % 2);
-    }
+    doc.querySelector("#button-start").addEventListener("click", () => {
+        board.clear();
+        board.createCells(onRoundEnd, roundCounter % 2);
 
-    doc.querySelector("#button-start").addEventListener("click", () => startRound());
+        consoleElement.innerHTML += `> Round ${++roundCounter}\n\n`;
+        consoleElement.scrollTop = consoleElement.scrollHeight;
+    });
+
+    const onRoundEnd = winner => {
+        if( winner === -1 ) {
+            tiesCounter++;
+            consoleElement.innerHTML += `> No one won the game! we have a tie.\n\n\n`;
+        } else {
+            players[winner].increaseScore();
+            consoleElement.innerHTML += `> Player ${winner} won the game. Chicken dinner, we have a winner!\n\n\n`;
+        }
+
+        consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
 })(document, GameBoard(document), [ human, computer ]);
 
 let consoleElement = document.querySelector("#console");

@@ -1,6 +1,7 @@
 :root {
     --color-player: #0092ca;
     --color-computer: #d65a31;
+    --color-console: #00ff00;
     --color1: #222831;
     --color2: #393e46;
     --color3: #eeeeee;
@@ -24,12 +25,12 @@ main {
     width: 50vh;
     height: 80vh;
     padding: 2vh;
-    color: #00ff00;
+    color: var(--color-console);
     background-color: var(--color1);
-    border: 2px solid #00ff00;
+    border: 2px solid var(--color-console);
     overflow-y: scroll;
     white-space: pre-wrap;
-    scrollbar-color: #00ff00 var(--color2);
+    scrollbar-color: var(--color-console) var(--color2);
 }
 
 #game {
@@ -64,22 +65,22 @@ main {
 
 #bar {
     height: 15vh;
-    background-color: var(--color2);
     display: grid;
     grid-template-columns: 2.7fr 1.3fr;
 }
 
 #score {
-    background-color: #d65a31;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
 }
 
 #score > div {
-    border: 2px solid black;
+    background-color: var(--color2);
 }
 
 #button-restart {
+    background-color: var(--color3);
 }
 
 .cell {
