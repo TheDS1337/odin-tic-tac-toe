@@ -25,10 +25,8 @@ function GameBoard(doc)
         boardElement.style.gridTemplate = `repeat(${size}, 1fr) / repeat(${size}, 1fr)`
         boardElement.style.gap = `${4 / size}vh`;
 
-        for( let i = 0; i < size; i++ ) {
-            let j = 0;
-
-            cells.push(Array.from(Array(size), () => {
+        cells = Array.from(Array(size), (_, i) => {
+            return Array.from(Array(size), (_, j) => {
                     let cell = doc.createElement("button");
 
                     cell.id = `cell-${i}-${j++}`;
@@ -39,8 +37,8 @@ function GameBoard(doc)
                     boardElement.appendChild(cell);
 
                     return cell;
-            }));
-        }
+            });
+        });
 
         currMove = startingMove;
     };
@@ -58,22 +56,13 @@ function GameBoard(doc)
         boardParentElement.insertBefore(boardElement, boardParentElement.firstChild);
     };
 
-    const checkConsecutiveMarks = (arr) => {
-        let lastType = arr[0].textContent;
+    const getLineType = (line) => {
+        let type = line[0].textContent;
 
-        for( let i = 1; i < arr.length; i++ ) {
-            let currType = arr[i].textContent;
+        if( type.length === 0 || !line.every(cell => cell.textContent === type) )
+            return -1;
 
-            if( currType.length === 0 )
-                return -1;
-
-            if( currType !== lastType )
-                return -1;
-
-            lastType = currType;
-        }
-
-        return typeToMark.indexOf(lastType);
+        return typeToMark.indexOf(type);
     }
 
     const checkWinner = () => {
@@ -85,7 +74,7 @@ function GameBoard(doc)
         }
 
         for( line of lines ) {
-            let winner = checkConsecutiveMarks(line);
+            let winner = getLineType(line);
 
             if( winner !== -1 )
                 return winner;
@@ -102,7 +91,8 @@ function GameBoard(doc)
         let y = parseInt(idToStr[2]); 
 
         if( buttonElement.textContent.length > 0 ) {
-            console.log(`Cannot click on the cell at (${x}, ${y}), as it is already filled.`);
+            consoleElement.innerHTML += (`> Cannot click on the cell at (${x}, ${y}), as it is already filled.\n`);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
             return;
         }
 
@@ -114,8 +104,10 @@ function GameBoard(doc)
         let winner = checkWinner();
 
         if( winner !== -1 ) {
-            console.log("Chicken dinner, we have a winner!");
-            console.log(`Player ${winner} won the game.`);
+            consoleElement.innerHTML += `> Player ${winner} won the game. Chicken dinner, we have a winner!\n`;
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+            
+            cells.forEach(r => r.forEach(cell => cell.removeEventListener("click", onCellClick)));
         }
     };
 
@@ -135,3 +127,5 @@ const gameController = (function (doc, board, players) {
 
     doc.querySelector("#button-start").addEventListener("click", () => startRound());
 })(document, GameBoard(document), [ human, computer ]);
+
+let consoleElement = document.querySelector("#console");

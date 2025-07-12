@@ -17,8 +17,26 @@ body {
 main {
     margin: auto;
     display: flex;
+    gap: 100px;
+}
+
+#console {
+    width: 50vh;
+    height: 80vh;
+    padding: 2vh;
+    color: #00ff00;
+    background-color: var(--color1);
+    border: 2px solid #00ff00;
+    overflow-y: scroll;
+    white-space: pre-wrap;
+    scrollbar-color: #00ff00 var(--color2);
+}
+
+#game {
+    height: 80vh;
+    display: flex;
     flex-direction: column;
-    gap: 25px;
+    justify-content: space-between;
 }
 
 #board {
@@ -44,7 +62,7 @@ main {
     color: var(--color1);
 }
 
-#game-bar {
+#bar {
     height: 15vh;
     background-color: var(--color2);
     display: grid;
