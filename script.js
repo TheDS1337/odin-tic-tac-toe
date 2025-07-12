@@ -64,6 +64,9 @@ function GameBoard(doc)
         playCounter = 0;
         onGameMove = moveCallback;
         onGameEnd = endCallback;
+
+        if( currMove === 1 )
+            computerMakeMove();
     };
 
     const clear = () => {
@@ -78,6 +81,8 @@ function GameBoard(doc)
 
         boardParentElement.insertBefore(boardElement, boardParentElement.firstChild);
     };
+
+    const getBoardElement = () => boardElement;
 
     const getLineType = (line) => {
         if( line[0].childElementCount === 0 )
@@ -140,6 +145,13 @@ function GameBoard(doc)
 
             buttonElement.appendChild(imgElement);
 
+            let idToStr = buttonElement.id.split('-');
+            let x = parseInt(idToStr[1]) + 1;
+            let y = parseInt(idToStr[2]) + 1;
+            
+            if( onGameMove !== null )
+                onGameMove(currMove, {x, y});
+
             playCounter++;
             currMove = 1 - currMove;
 
@@ -182,7 +194,7 @@ function GameBoard(doc)
             computerMakeMove();
     };
 
-    return { createCells, clear };
+    return { createCells, clear, getBoardElement };
 };
 
 let human = Player("Amine");
@@ -190,6 +202,8 @@ let computer = Player("Elon Musk");
 
 const gameController = (function (doc, board, players) {
     let consoleElement = doc.querySelector("#console");
+    consoleElement.innerHTML = "";
+
     let tiesScoreElement = doc.querySelector("#score-ties .score");
 
     players[0].setScoreElement(doc.querySelector("#score-human .score"));
@@ -198,13 +212,15 @@ const gameController = (function (doc, board, players) {
     let roundCounter = 0;
     let tiesCounter = 0;
 
-    doc.querySelector("#button-start").addEventListener("click", () => {
+    const startNewRound = () => {
         board.clear();
         board.createCells(onRoundMove, onRoundEnd, roundCounter % 2);
 
         consoleElement.innerHTML += `> Round ${++roundCounter}\n\n`;
         consoleElement.scrollTop = consoleElement.scrollHeight;
-    });
+    }
+
+    doc.querySelector("#button-start").addEventListener("click", () => startNewRound());
 
     const onRoundMove = (mover, pos) => {
         consoleElement.innerHTML += `> ${players[mover].getName()} played the position (${pos.x}, ${pos.y}).\n`;
@@ -221,5 +237,25 @@ const gameController = (function (doc, board, players) {
         }
 
         consoleElement.scrollTop = consoleElement.scrollHeight;
+
+        let blurElement = doc.createElement("div");
+        blurElement.id = "blur";
+
+        let boardElement = board.getBoardElement();
+        boardElement.appendChild(blurElement);
+        
+        setTimeout(() => {
+            let restartButtonElement = doc.createElement("button");
+            restartButtonElement.id = "button-restart";
+
+            restartButtonElement.addEventListener("click", () => startNewRound());
+
+            let restartButtonImage = doc.createElement("img");
+            restartButtonImage.src = "icons/restart.svg";
+
+            restartButtonElement.appendChild(restartButtonImage);
+            blurElement.appendChild(restartButtonElement);
+
+        }, 2000);
     };
 })(document, GameBoard(document), [ human, computer ]);

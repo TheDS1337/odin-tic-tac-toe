@@ -45,12 +45,13 @@ main {
     width: 60vh;
     height: 60vh;
     background-color: var(--color1);
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 25px;
 }
 
-#board > div {
+#board > div:not(#blur) {
     padding-top: 5vh;
     color: var(--color-console);
     font-size: 12.5vh;
@@ -88,13 +89,8 @@ main {
     filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(89%) contrast(87%);
 }
 
-#bar {
-    height: 15vh;
-    display: grid;
-    grid-template-columns: 2.7fr 1.3fr;
-}
-
 #scores {
+    height: 15vh;
     color: #00ff00;
     border: 2px solid var(--color-console);
     border-radius: 5px;
@@ -131,13 +127,22 @@ main {
     filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(89%) contrast(87%);
 }
 
-#button-restart {
-    background-color: var(--color1);
+#blur {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    mask-image: radial-gradient(circle, black 75%, transparent 110%);
+    -webkit-mask-image: radial-gradient(circle, black 75%, transparent 110%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #button-restart > img {
-    width: 10vh;
-    height: 10vh;
+    width: 50vh;
+    height: 50vh;
     filter: invert(69%) sepia(81%) saturate(4164%) hue-rotate(83deg) brightness(111%) contrast(131%);
 }
 
