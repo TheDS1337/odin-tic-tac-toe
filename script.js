@@ -1,14 +1,32 @@
 function Player(name)
 {
     let score = 0;
+    let scoreElement = null;
+
+    const updateScoreElement = () => {
+        if( scoreElement === null )
+            return;
+
+        scoreElement.textContent = `${score}`;
+    }
 
     const getName = () => name;
     const setName = (newName) => name = newName;
     const getScore = () => score;
-    const increaseScore = () => score++;
-    const resetScore = () => score = 0;
 
-    return { getName, setName, getScore, increaseScore, resetScore };
+    const setScoreElement = (elm) => scoreElement = elm;
+
+    const increaseScore = () => {
+        score++;
+        updateScoreElement();
+    }
+
+    const resetScore = () => {
+        score = 0;
+        updateScoreElement();
+    }
+
+    return { getName, setName, getScore, setScoreElement, increaseScore, resetScore };
 }
 
 function GameBoard(doc)
@@ -95,8 +113,7 @@ function GameBoard(doc)
         let y = parseInt(idToStr[2]); 
 
         if( buttonElement.textContent.length > 0 ) {
-            consoleElement.innerHTML += (`> Cannot click on the cell at (${x}, ${y}), as it is already filled.\n`);
-            consoleElement.scrollTop = consoleElement.scrollHeight;
+            console.log(`Cannot click on the cell at (${x}, ${y}), as it is already filled.`);
             return;
         }
 
@@ -119,9 +136,15 @@ function GameBoard(doc)
 };
 
 let human = Player("Amine");
-let computer = Player("Computer");
+let computer = Player("Elon Musk");
 
 const gameController = (function (doc, board, players) {
+    let consoleElement = doc.querySelector("#console");
+    let tiesScoreElement = doc.querySelector("#score-ties .score");
+
+    players[0].setScoreElement(doc.querySelector("#score-human .score"));
+    players[1].setScoreElement(doc.querySelector("#score-computer .score"));
+
     let roundCounter = 0;
     let tiesCounter = 0;
 
@@ -135,15 +158,13 @@ const gameController = (function (doc, board, players) {
 
     const onRoundEnd = winner => {
         if( winner === -1 ) {
-            tiesCounter++;
+            tiesScoreElement.textContent = `${++tiesCounter}`;
             consoleElement.innerHTML += `> No one won the game! we have a tie.\n\n\n`;
         } else {
             players[winner].increaseScore();
-            consoleElement.innerHTML += `> Player ${winner} won the game. Chicken dinner, we have a winner!\n\n\n`;
+            consoleElement.innerHTML += `> ${players[winner].getName()} won the game. Chicken dinner, we have a winner!\n\n\n`;
         }
 
         consoleElement.scrollTop = consoleElement.scrollHeight;
     };
 })(document, GameBoard(document), [ human, computer ]);
-
-let consoleElement = document.querySelector("#console");

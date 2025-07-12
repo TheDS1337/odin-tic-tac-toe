@@ -58,9 +58,11 @@ main {
 
 #button-start {
     padding: 5vh 10vh;
-    font-size: 5vh;
-    font-weight: 600;
-    color: var(--color1);
+}
+
+#button-start > img {
+    width: 10vh;
+    height: 10vh;
 }
 
 #bar {
@@ -69,18 +71,34 @@ main {
     grid-template-columns: 2.7fr 1.3fr;
 }
 
-#score {
+#scores {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2px;
 }
 
-#score > div {
+#scores > div {
+    padding-top: 2vh;
+    padding-bottom: 1vh;
     background-color: var(--color2);
+    font-size: 4vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#scores img {
+    width: 7vh;
+    height: 7vh;
 }
 
 #button-restart {
-    background-color: var(--color3);
+}
+
+#button-restart > img {
+    width: 10vh;
+    height: 10vh;
 }
 
 .cell {
