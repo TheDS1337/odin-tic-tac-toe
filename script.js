@@ -32,7 +32,6 @@ function Player(name)
 function GameBoard(doc)
 {
     const typeToMark = ['X', 'O'];
-    const typeToColor = ['var(--color-player)', 'var(--color-computer)'];
 
     let cells = [];
     let boardElement = doc.querySelector("#board");
@@ -81,9 +80,12 @@ function GameBoard(doc)
     };
 
     const getLineType = (line) => {
-        let type = line[0].textContent;
+        if( line[0].childElementCount === 0 )
+            return -1;
 
-        if( type.length === 0 || !line.every(cell => cell.textContent === type) )
+        let type = line[0].className.split(' ').pop();
+
+        if( !line.every(cell => type === cell.className.split(' ').pop()) )
             return -1;
 
         return typeToMark.indexOf(type);
@@ -120,36 +122,53 @@ function GameBoard(doc)
 
     const computerMakeMove = () => {
         // Just some stupid AI logic here :]
+        const getRandom = (max, min = 0) => min + Math.floor(Math.random() * (max - min));
 
-        let emptyCells = cells.flat().filter(cell => cell.textContent.length === 0);
+        let emptyCells = cells.flat().filter(cell => cell.childElementCount === 0);
 
-        if( emptyCells.length === 0 ) {
+        if( emptyCells.length === 0 )
             return;
-        }
 
-        let buttonElement = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        // Make it take time to think, as if it really does...
+        setTimeout(() => {
+            let buttonElement = emptyCells[getRandom(emptyCells.length)];
 
-        buttonElement.textContent = typeToMark[currMove];
-        buttonElement.style.backgroundColor = typeToColor[currMove];
+            buttonElement.classList.add(typeToMark[currMove]);
 
-        playCounter++;
-        currMove = 1 - currMove;
+            let imgElement = doc.createElement("img");
+            imgElement.src = `icons/${typeToMark[currMove]}.svg`;
+
+            buttonElement.appendChild(imgElement);
+
+            playCounter++;
+            currMove = 1 - currMove;
+
+            checkWinner();
+        }, getRandom(2500, 250));
     };
 
     const onCellClick = (event) => {
+        // Makes sure the player cant click while computer is still thinking
+        if( currMove !== 0 )
+            return;
+
         let buttonElement = event.target;
 
         let idToStr = buttonElement.id.split('-');
         let x = parseInt(idToStr[1]) + 1;
         let y = parseInt(idToStr[2]) + 1; 
 
-        if( buttonElement.textContent.length > 0 ) {
+        if( buttonElement.childElementCount > 0 ) {
             console.log(`Cannot click on the cell at (${x}, ${y}), as it is already filled.`);
             return;
         }
 
-        buttonElement.textContent = typeToMark[currMove];
-        buttonElement.style.backgroundColor = typeToColor[currMove];
+        buttonElement.classList.add(typeToMark[currMove]);
+
+        let imgElement = doc.createElement("img");
+        imgElement.src = `icons/${typeToMark[currMove]}.svg`;
+
+        buttonElement.appendChild(imgElement);
 
         if( onGameMove !== null )
             onGameMove(currMove, {x, y});
@@ -159,10 +178,8 @@ function GameBoard(doc)
 
         let winner = checkWinner();
 
-        if( winner === -1 ) {
+        if( winner === -1 )
             computerMakeMove();
-            checkWinner();
-        }
     };
 
     return { createCells, clear };
