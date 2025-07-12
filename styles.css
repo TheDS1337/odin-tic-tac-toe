@@ -81,6 +81,7 @@ main {
 }
 
 .X, .O, #button-restart {
+    position: relative;
     background: none;
     border: none;
 }
@@ -88,14 +89,47 @@ main {
 .X {
     background-image: url("icons/X.svg");
     background-size: cover;
-    filter: invert(44%) sepia(57%) saturate(5312%) hue-rotate(172deg) brightness(96%) contrast(101%);
+    filter: invert(44%) sepia(57%) saturate(5312%) hue-rotate(172deg) brightness(75%) contrast(101%);
 }
-
 
 .O {
     background-image: url("icons/O.svg");
     background-size: cover;
-    filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(89%) contrast(87%);
+    filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(75%) contrast(87%);
+}
+
+.shine-X {
+    animation: anim1 0.5s linear infinite;
+    animation-delay: calc(200ms * var(--i));
+}
+
+@keyframes anim1 {
+    0%,
+    100% {
+        filter: invert(44%) sepia(57%) saturate(5312%) hue-rotate(172deg) brightness(100%) contrast(101%);
+    }
+
+    5%,
+    95% {
+        filter: invert(44%) sepia(57%) saturate(5312%) hue-rotate(172deg) brightness(125%) contrast(101%);
+    }
+}
+
+.shine-O {
+    animation: anim2 0.5s linear infinite;
+    animation-delay: calc(200ms * var(--i));
+}
+
+@keyframes anim2 {
+    0%,
+    100% {
+        filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(100%) contrast(87%);
+    }
+
+    5%,
+    95% {
+        filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(125%) contrast(87%);
+    }
 }
 
 #scores {

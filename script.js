@@ -95,6 +95,11 @@ function GameBoard(doc)
         if( !line.every(cell => type === cell.className.split(' ').pop()) )
             return -1;
 
+        line.forEach((cell, id) => { 
+            cell.classList.add(`shine-${type}`);
+            cell.style.setProperty("--i", `${id + 1}`);
+        });
+
         return typeToMark.indexOf(type);
     }
 
@@ -235,20 +240,18 @@ const gameController = (function (doc, board, players) {
         }
 
         consoleElement.scrollTop = consoleElement.scrollHeight;
-
-        let blurElement = doc.createElement("div");
-        blurElement.id = "blur";
-
-        let boardElement = board.getBoardElement();
-        boardElement.appendChild(blurElement);
         
         setTimeout(() => {
+            let blurElement = doc.createElement("div");
+            blurElement.id = "blur";
+
             let restartButtonElement = doc.createElement("button");
 
             restartButtonElement.id = "button-restart";
             restartButtonElement.addEventListener("click", () => startNewRound());
 
             blurElement.appendChild(restartButtonElement);
+            board.getBoardElement().appendChild(blurElement);
         }, 2000);
     };
 })(document, GameBoard(document), [ human, computer ]);
