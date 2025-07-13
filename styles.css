@@ -1,6 +1,6 @@
 :root {
-    --color-human: #0092ca;
-    --color-computer: #d65a31;
+    --color-X: #0092ca;
+    --color-O: #d65a31;
     --color-console: #00ff00;
     --color1: #222831;
     --color2: #393e46;
@@ -25,10 +25,12 @@ main {
     width: 50vh;
     height: 80vh;
     padding: 2vh;
+    font-size: 2vh;
     color: var(--color-console);
     background-color: var(--color1);
     border: 2px solid var(--color-console);
     border-radius: 5px;
+    user-select: auto;
     overflow-y: scroll;
     white-space: pre-wrap;
     scrollbar-color: var(--color-console) var(--color2);
@@ -46,9 +48,15 @@ main {
     height: 60vh;
     background-color: var(--color1);
     position: relative;
+    user-select: none;
     display: flex;
     flex-direction: column;
     gap: 25px;
+}
+
+#board > div:first-of-type + div {
+    display: flex;
+    justify-content: center;
 }
 
 #board > div:not(#blur) {
@@ -59,12 +67,17 @@ main {
 }
 
 #button-start {
-    padding: 5vh 10vh;
+    width: 20vh;
+    height: 20vh;
+    background: none;
+    background-image: url("icons/start.svg");
+    background-size: cover;
+    border: none;
+    filter: invert(69%) sepia(81%) saturate(4164%) hue-rotate(83deg) brightness(75%) contrast(131%);
 }
 
-#button-start > img {
-    width: 10vh;
-    height: 10vh;
+#button-start:hover {
+    filter: invert(69%) sepia(81%) saturate(4164%) hue-rotate(83deg) brightness(100%) contrast(131%);
 }
 
 .cell {
@@ -136,6 +149,7 @@ main {
     height: 15vh;
     border: 2px solid var(--color-console);
     border-radius: 5px;
+    user-select: none;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2px;
@@ -153,7 +167,9 @@ main {
 .score {
     width: 7vh;
     height: 7vh;
+    background: none;
     background-size: cover;
+    border: none;
 }
 
 .score + div {
@@ -161,12 +177,12 @@ main {
     font-size: 4vh;
 }
 
-#score-human > .score {
+#score-X > .score {
     background-image: url("icons/human.svg");
     filter: invert(44%) sepia(57%) saturate(5312%) hue-rotate(172deg) brightness(50%) contrast(101%);
 }
 
-#score-human > .score:hover {
+#score-X > .score:hover {
     filter: invert(44%) sepia(57%) saturate(5312%) hue-rotate(172deg) brightness(100%) contrast(101%);
 }
 
@@ -175,12 +191,12 @@ main {
     filter: invert(99%) sepia(87%) saturate(79%) hue-rotate(205deg) brightness(114%) contrast(87%);
 }
 
-#score-computer > .score {
+#score-O > .score {
     background-image: url("icons/computer.svg");
     filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(50%) contrast(87%);
 }
 
-#score-computer > .score:hover {
+#score-O > .score:hover {
     filter: invert(39%) sepia(98%) saturate(1002%) hue-rotate(343deg) brightness(100%) contrast(87%);
 }
 
@@ -220,4 +236,24 @@ a:link {
 
 a:hover {
     color: var(--color-console);
+}
+
+#change-name-dialog {
+    color: var(--color-console);
+    background-color: var(--color1);
+    border: 2px solid var(--color-console);
+    border-radius: 5px;
+}
+
+#change-name-dialog input {
+    font-weight: 700;
+    background-color: var(--color2);
+    border: 2px solid var(--color3);
+    border-radius: 5px;
+}
+
+#change-name-dialog button {
+    color: var(--color-console);
+    background-color: var(--color2);
+    border-radius: 5px;
 }

@@ -16,14 +16,12 @@
         <div id="game">
             <div id="board">
                 <div>Tic Tac Toe!</div>
-                <button id="button-start">
-                    <img src="icons/start.svg">
-                </button>
+                <div><button id="button-start"></button></div>
             </div>
             <div id="bar">
                 <div id="scores">
-                    <div id="score-human">
-                        <div class="score"></div>
+                    <div id="score-X">
+                        <button class="score"></button>
                         <div>0</div>
                     </div>
 
@@ -32,8 +30,8 @@
                         <div>0</div>
                     </div>
 
-                    <div id="score-computer">
-                        <div class="score"></div>
+                    <div id="score-O">
+                        <button class="score"></button>
                         <div>0</div>
                     </div>
                 </div>
@@ -44,5 +42,17 @@
     <footer>
         Created by <a href="https://github.com/TheDS1337">DS</a>, icons by <a href="https://www.svgrepo.com/author/thewolfkit/">Thewolfkit</a>.
     </footer>
+
+    <dialog id="change-name-dialog">
+        <form method="dialog">
+            <label for="player-name">Enter new name:</label>
+            <input type="text" id="player-name" required>
+
+            <div>
+                <button value="cancel">Cancel</button>
+                <button value="ok">OK</button>
+            </div>
+        </form>
+    </dialog>
 </body>
 </html>

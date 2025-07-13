@@ -1,37 +1,20 @@
 function Player(name)
 {
     let score = 0;
-    let scoreElement = null;
-
-    const updateScoreElement = () => {
-        if( scoreElement === null )
-            return;
-
-        scoreElement.textContent = `${score}`;
-    }
 
     const getName = () => name;
     const setName = (newName) => name = newName;
     const getScore = () => score;
 
-    const setScoreElement = (elm) => scoreElement = elm;
+    const increaseScore = () => score++;
+    const resetScore = () => score = 0;
 
-    const increaseScore = () => {
-        score++;
-        updateScoreElement();
-    }
-
-    const resetScore = () => {
-        score = 0;
-        updateScoreElement();
-    }
-
-    return { getName, setName, getScore, setScoreElement, increaseScore, resetScore };
+    return { getName, setName, getScore, increaseScore, resetScore };
 }
 
 function GameBoard(doc)
 {
-    const typeToMark = ['X', 'O'];
+    const playerIdToMark = ['X', 'O'];
 
     let cells = [];
     let boardElement = doc.querySelector("#board");
@@ -83,24 +66,26 @@ function GameBoard(doc)
     };
 
     const getBoardElement = () => boardElement;
+    const getMarkFromPlayerId = (type) => playerIdToMark[type];
+    const getPlayerIdFromMark = (mark) => playerIdToMark.indexOf(mark);
 
     const getLineType = (line) => {
         let classNames = line[0].className.split(' ');
 
-        if( !classNames.includes(typeToMark[0]) && !classNames.includes(typeToMark[1]) )
+        if( !classNames.includes(getMarkFromPlayerId(0)) && !classNames.includes(getMarkFromPlayerId(1)) )
             return -1;
 
-        let type = classNames.pop();
+        let mark = classNames.pop();
 
-        if( !line.every(cell => type === cell.className.split(' ').pop()) )
+        if( !line.every(cell => mark === cell.className.split(' ').pop()) )
             return -1;
 
         line.forEach((cell, id) => { 
-            cell.classList.add(`shine-${type}`);
+            cell.classList.add(`shine-${mark}`);
             cell.style.setProperty("--i", `${id + 1}`);
         });
 
-        return typeToMark.indexOf(type);
+        return getPlayerIdFromMark(mark);
     }
 
     const checkWinner = () => {
@@ -139,7 +124,7 @@ function GameBoard(doc)
         let emptyCells = cells.flat().filter(cell => {
             let classNames = cell.className.split(' ');
         
-            return !classNames.includes(typeToMark[0]) && !classNames.includes(typeToMark[1])
+            return !classNames.includes(getMarkFromPlayerId(0)) && !classNames.includes(getMarkFromPlayerId(1))
         });
 
         if( emptyCells.length === 0 )
@@ -149,7 +134,7 @@ function GameBoard(doc)
         setTimeout(() => {
             let buttonElement = emptyCells[getRandom(emptyCells.length)];
 
-            buttonElement.classList.add(typeToMark[currMove]);
+            buttonElement.classList.add(getMarkFromPlayerId(currMove));
 
             let idToStr = buttonElement.id.split('-');
             let x = parseInt(idToStr[1]) + 1;
@@ -178,12 +163,12 @@ function GameBoard(doc)
 
         let classNames = buttonElement.className.split(' ');
 
-        if( classNames.includes(typeToMark[0]) || classNames.includes(typeToMark[1]) ) {
+        if( classNames.includes(getMarkFromPlayerId(0)) || classNames.includes(getMarkFromPlayerId(1)) ) {
             console.log(`Cannot click on the cell at (${x}, ${y}), as it is already filled.`);
             return;
         }
 
-        buttonElement.classList.add(typeToMark[currMove]);
+        buttonElement.classList.add(getMarkFromPlayerId(currMove));
 
         if( onGameMove !== null )
             onGameMove(currMove, {x, y});
@@ -197,7 +182,7 @@ function GameBoard(doc)
             computerMakeMove();
     };
 
-    return { createCells, clear, getBoardElement };
+    return { createCells, clear, getBoardElement, getMarkFromPlayerId, getPlayerIdFromMark };
 };
 
 let human = Player("Amine");
@@ -208,9 +193,58 @@ const gameController = (function (doc, board, players) {
     consoleElement.innerHTML = "";
 
     let tiesScoreElement = doc.querySelector("#score-ties .score + div");
+    let playerScoreElements = [doc.querySelector("#score-X .score + div"),
+        doc.querySelector("#score-O .score + div")];
 
-    players[0].setScoreElement(doc.querySelector("#score-human .score + div"));
-    players[1].setScoreElement(doc.querySelector("#score-computer .score + div"));
+    const changeNameElement = doc.querySelector("#change-name-dialog");
+    const playerNameElement = doc.querySelector("#player-name");
+
+    doc.querySelector("#change-name-dialog button[value='ok'").addEventListener("click", () => {
+        changeNameElement.returnValue = "ok";
+    });
+
+    doc.querySelector("#change-name-dialog button[value='cancel'").addEventListener("click", () => {
+        changeNameElement.returnValue = "cancel";
+    });
+
+    doc.querySelector("#change-name-dialog > form").addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        if( changeNameElement.returnValue === "ok" ) {
+            const newName = playerNameElement.value.trim();
+            const playerId = board.getPlayerIdFromMark(playerNameElement.name);
+            
+            if (newName.length > 0)
+                players[playerId].setName(newName);
+        }
+
+        changeNameElement.close();
+    });
+
+    for( let scoreDiv of doc.querySelectorAll(".score") ) {
+        scoreDiv.addEventListener("click", event => {
+            let parent = event.target.parentNode;
+
+            switch( parent.id ) {
+                case "score-X":
+                    playerNameElement.value = players[0].getName();
+                    playerNameElement.name = board.getMarkFromPlayerId(0);
+                    playerNameElement.style.color = "var(--color-X)";
+                    changeNameElement.showModal();
+                    break;
+                
+                case "score-O":
+                    playerNameElement.value = players[1].getName();
+                    playerNameElement.name = board.getMarkFromPlayerId(1);
+                    playerNameElement.style.color = "var(--color-O)";
+                    changeNameElement.showModal();
+                    break;
+
+                default:
+                    break;
+            }
+        });
+    }
 
     let roundCounter = 0;
     let tiesCounter = 0;
@@ -219,24 +253,25 @@ const gameController = (function (doc, board, players) {
         board.clear();
         board.createCells(onRoundMove, onRoundEnd, roundCounter % 2);
 
-        consoleElement.innerHTML += `> Round ${++roundCounter}\n\n`;
+        consoleElement.innerHTML += `$  Round ${++roundCounter}\n`;
         consoleElement.scrollTop = consoleElement.scrollHeight;
     }
 
     doc.querySelector("#button-start").addEventListener("click", () => startNewRound());
 
     const onRoundMove = (mover, pos) => {
-        consoleElement.innerHTML += `> ${players[mover].getName()} played the position (${pos.x}, ${pos.y}).\n`;
+        consoleElement.innerHTML += `$  ${players[mover].getName()} played the position (${pos.x}, ${pos.y}).\n`;
         consoleElement.scrollTop = consoleElement.scrollHeight;
     };
 
     const onRoundEnd = winner => {
         if( winner === -1 ) {
             tiesScoreElement.textContent = `${++tiesCounter}`;
-            consoleElement.innerHTML += `> No one won the game! we have a tie.\n\n\n`;
+            consoleElement.innerHTML += `$  No one won the game! we have a tie.\n\n`;
         } else {
             players[winner].increaseScore();
-            consoleElement.innerHTML += `> ${players[winner].getName()} won the game. Chicken dinner, we have a winner!\n\n\n`;
+            playerScoreElements[winner].textContent = `${players[winner].getScore()}`;
+            consoleElement.innerHTML += `$  ${players[winner].getName()} won the game. Chicken dinner, we have a winner!\n\n`;
         }
 
         consoleElement.scrollTop = consoleElement.scrollHeight;
