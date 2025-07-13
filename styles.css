@@ -36,6 +36,11 @@ main {
     scrollbar-color: var(--color-console) var(--color2);
 }
 
+#console::selection {
+    color: var(--color3);
+    background-color: var(--color2);
+}
+
 #game {
     height: 80vh;
     display: flex;
@@ -225,6 +230,11 @@ footer {
     color: var(--color-console);
 }
 
+footer::selection {
+    color: var(--color3);
+    background-color: var(--color2);
+}
+
 a {
     text-decoration: none;
     font-weight: 600;
@@ -250,6 +260,11 @@ a:hover {
     background-color: var(--color2);
     border: 2px solid var(--color3);
     border-radius: 5px;
+}
+
+#change-name-dialog input::selection {
+    color: var(--color-console);
+    background-color: var(--color1);
 }
 
 #change-name-dialog button {
