@@ -96,7 +96,7 @@ function GameBoard(doc)
             lines.push(cells[i]);
         }
 
-        for( line of lines ) {
+        for( const line of lines ) {
             let winner = getLineType(line);
 
             if( winner !== -1 ) {
@@ -185,8 +185,8 @@ function GameBoard(doc)
     return { createCells, clear, getBoardElement, getMarkFromPlayerId, getPlayerIdFromMark };
 };
 
-let human = Player("Amine");
-let computer = Player("Elon Musk");
+let human = Player("DS");
+let computer = Player("Elon");
 
 const gameController = (function (doc, board, players) {
     let consoleElement = doc.querySelector("#console");
@@ -221,7 +221,7 @@ const gameController = (function (doc, board, players) {
         changeNameElement.close();
     });
 
-    for( let scoreDiv of doc.querySelectorAll(".score") ) {
+    for( const scoreDiv of doc.querySelectorAll(".score") ) {
         scoreDiv.addEventListener("click", event => {
             let parent = event.target.parentNode;
 
